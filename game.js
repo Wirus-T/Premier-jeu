@@ -27,7 +27,8 @@ let gameState = "idle";
 let lastFrameTime = 0;
 let timeSinceLastObstacle = 0;
 let animationFrameId = null;
-let touchActive = false;
+let isPaused = false;
+let activeTouchPointerId = null;
 
 const pressedKeys = new Set();
 
@@ -39,6 +40,7 @@ startButton.addEventListener("click", startGame);
 window.addEventListener("keydown", handleKeyDown);
 window.addEventListener("keyup", handleKeyUp);
 window.addEventListener("blur", () => pressedKeys.clear());
+document.addEventListener("visibilitychange", handleVisibilityChange);
 canvas.addEventListener("pointerdown", handleTouchStart);
 canvas.addEventListener("pointermove", handleTouchMove);
 canvas.addEventListener("pointerup", handleTouchEnd);
@@ -50,17 +52,19 @@ function startGame() {
   timeSinceLastObstacle = 0;
   lastFrameTime = performance.now();
   gameState = "playing";
+  isPaused = document.hidden;
+  activeTouchPointerId = null;
   scoreElement.textContent = score;
   startButton.hidden = true;
   pressedKeys.clear();
   resetPlayer();
 
   cancelAnimationFrame(animationFrameId);
-  animationFrameId = requestAnimationFrame(gameLoop);
+  if (!isPaused) animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 function gameLoop(currentTime) {
-  if (gameState !== "playing") return;
+  if (gameState !== "playing" || isPaused) return;
 
   const deltaTime = Math.min((currentTime - lastFrameTime) / 1000, 0.05);
   lastFrameTime = currentTime;
@@ -69,7 +73,7 @@ function gameLoop(currentTime) {
   updateObstacles(deltaTime);
   drawScene();
 
-  if (gameState === "playing") {
+  if (gameState === "playing" && !isPaused) {
     animationFrameId = requestAnimationFrame(gameLoop);
   }
 }
@@ -126,6 +130,7 @@ function createObstacle() {
 function endGame() {
   gameState = "gameOver";
   pressedKeys.clear();
+  activeTouchPointerId = null;
 
   if (score > bestScore) {
     bestScore = score;
@@ -190,19 +195,43 @@ function handleKeyUp(event) {
 }
 
 function handleTouchStart(event) {
-  if (event.pointerType !== "touch" || gameState !== "playing") return;
-  touchActive = true;
+  if (
+    event.pointerType !== "touch" ||
+    gameState !== "playing" ||
+    isPaused ||
+    activeTouchPointerId !== null
+  ) return;
+
+  activeTouchPointerId = event.pointerId;
   canvas.setPointerCapture(event.pointerId);
   movePlayerToTouch(event);
 }
 
 function handleTouchMove(event) {
-  if (event.pointerType !== "touch" || !touchActive || gameState !== "playing") return;
+  if (event.pointerId !== activeTouchPointerId || gameState !== "playing" || isPaused) return;
   movePlayerToTouch(event);
 }
 
 function handleTouchEnd(event) {
-  if (event.pointerType === "touch") touchActive = false;
+  if (event.pointerId === activeTouchPointerId) activeTouchPointerId = null;
+}
+
+function handleVisibilityChange() {
+  if (document.hidden) {
+    if (gameState === "playing") {
+      isPaused = true;
+      cancelAnimationFrame(animationFrameId);
+      pressedKeys.clear();
+      activeTouchPointerId = null;
+    }
+    return;
+  }
+
+  if (gameState === "playing" && isPaused) {
+    isPaused = false;
+    lastFrameTime = performance.now();
+    animationFrameId = requestAnimationFrame(gameLoop);
+  }
 }
 
 function movePlayerToTouch(event) {
