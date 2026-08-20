@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Dodge</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="game-shell">
+      <h1 class="visually-hidden">Star Dodge</h1>
+
+      <div class="game-area">
+        <canvas
+          id="gameCanvas"
+          width="480"
+          height="720"
+          aria-label="Jeu d'évitement d'obstacles"
+        ></canvas>
+
+        <div class="scoreboard" aria-live="polite">
+          <span>Score&nbsp;: <strong id="score">0</strong></span>
+          <span>Record&nbsp;: <strong id="bestScore">0</strong></span>
+        </div>
+
+        <button id="startButton" class="star-button" type="button">
+          Start
+        </button>
+      </div>
+
+      <p class="instructions">
+        Clavier&nbsp;: ← → ou A/D (Q/D en AZERTY). Écran tactile&nbsp;: glissez le doigt.
+      </p>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
