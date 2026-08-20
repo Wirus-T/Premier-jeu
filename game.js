@@ -4,6 +4,9 @@ const canvas = document.querySelector("#gameCanvas");
 const context = canvas.getContext("2d");
 const scoreElement = document.querySelector("#score");
 const bestScoreElement = document.querySelector("#bestScore");
+const gameOverPanel = document.querySelector("#gameOverPanel");
+const finalScoreElement = document.querySelector("#finalScore");
+const finalBestScoreElement = document.querySelector("#finalBestScore");
 const startButton = document.querySelector("#startButton");
 
 const GAME_WIDTH = 480;
@@ -55,6 +58,7 @@ function startGame() {
   isPaused = document.hidden;
   activeTouchPointerId = null;
   scoreElement.textContent = score;
+  gameOverPanel.hidden = true;
   startButton.hidden = true;
   pressedKeys.clear();
   resetPlayer();
@@ -138,6 +142,9 @@ function endGame() {
     saveBestScore(bestScore);
   }
 
+  finalScoreElement.textContent = score;
+  finalBestScoreElement.textContent = bestScore;
+  gameOverPanel.hidden = false;
   drawScene();
   startButton.textContent = "Restart";
   startButton.hidden = false;

@@ -59,6 +59,32 @@ canvas {
   pointer-events: none;
 }
 
+.game-over-panel {
+  position: absolute;
+  top: 19%;
+  left: 50%;
+  width: min(78%, 320px);
+  transform: translateX(-50%);
+  padding: 16px 20px;
+  border: 1px solid #7a87e8;
+  border-radius: 14px;
+  background: rgb(4 7 20 / 88%);
+  pointer-events: none;
+}
+
+.game-over-panel[hidden] {
+  display: none;
+}
+
+.game-over-panel h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.2rem, 5vw, 1.6rem);
+}
+
+.game-over-panel p {
+  margin: 4px 0;
+}
+
 .star-button {
   position: absolute;
   top: 50%;
